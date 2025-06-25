@@ -6,9 +6,11 @@ from rest_framework.response import Response
 from openai import OpenAI
 from .models import AICompletion
 from django.core.paginator import Paginator
-
+from decouple import config
 # Initialize client (it will also pick up OPENAI_API_KEY from env)
-client = OpenAI(api_key="")
+api_key = config("OPENAI_API_KEY")
+
+client = OpenAI(api_key=api_key)
 
 @api_view(['POST'])
 def ai_completion(request):
