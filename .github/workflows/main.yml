@@ -1,0 +1,25 @@
+name: Deploy Python App to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Zip app files
+      run: zip -r app.zip . -x "*.git*" ".github/*"
+
+    - name: Copy zip to EC2 using appleboy/scp
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "app.zip"
+        target: "/home/${{ secrets.EC2_USER }}/"
