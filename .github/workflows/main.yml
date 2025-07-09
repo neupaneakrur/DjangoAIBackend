@@ -23,3 +23,19 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "app.zip"
         target: "/home/${{ secrets.EC2_USER }}/"
+
+    - name: SSH into EC2 to unzip and deploy
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          sudo rm -rf /opt/app/DjangoAIBackend/*
+          sudo unzip -o ~/app.zip -d /opt/app/DjangoAIBackend
+          sudo cd /opt/app/DjangoAIBackend
+          sudo source /opt/venv/bin/activate
+          sudo pip install -r requirements.txt
+          sudo systemctl restart django-app.service
+          sudo systemctl restart nginx
+          rm -rf /home/ec2-user/app.zip
